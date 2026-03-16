@@ -270,20 +270,20 @@ If you are building the next layer, we want to talk.
 
 *⁵ USD.ai [documentation](https://docs.usd.ai/); ["USDai Powered by M0"](https://usd.ai/stories/usdai-powered-by-m0); M0 [eligible collateral docs](https://docs.m0.org/).*
 
-*⁶ Circle, ["Circle Announces USDC Smart Contract for Transfers of BlackRock's BUIDL Fund"](https://www.circle.com/pressroom/circle-announces-usdc-smart-contract-for-transfers-of-blackrocks-buidl-fund).*
+*⁶ Circle, ["Circle Announces USDC Smart Contract for Transfers by BlackRock's BUIDL Fund Investors"](https://www.circle.com/pressroom/circle-announces-usdc-smart-contract-for-transfers-by-blackrocks-buidl-fund-investors).*
 
 *⁷ Centrifuge, ["Anemoy Liquidity Network"](https://centrifuge.io/blog/anemoy-liquidity-network).*
 
-*⁸ BlackRock, ["BlackRock Launches Its First Tokenized Fund, BUIDL, on the Ethereum Network,"](https://www.businesswire.com/news/home/20240320771318/en/BlackRock-Launches-Its-First-Tokenized-Fund-BUIDL-on-the-Ethereum-Network) BusinessWire, March 2024.*
+*⁸ BlackRock, ["BlackRock Launches Its First Tokenized Fund, BUIDL, on the Ethereum Network,"](https://securitize.io/learn/press/blackrock-launches-first-tokenized-fund-buidl-on-the-ethereum-network) Securitize, March 2024.*
 
 *⁹ [The Block](https://www.theblock.co/post/359687/sky-grove-jaaa-redemption), March 2026; [Grove data dashboard](https://data.grove.finance/assets/JAAA).*
 
-*¹⁰ rwa.xyz on-chain holder data, March 8, 2026. See also [CryptoRank](https://cryptorank.io/news/feed/70e85-ethena-labs-launches-usdtb-backed-by-blackrock), [Ondo Finance blog](https://ondo.finance/blog/the-liquidity-advantage-how-ousg-provides-robust-multi-channel-liquidity).*
+*¹⁰ rwa.xyz on-chain holder data, March 8, 2026. See also [USDtb](https://usdtb.money), [Ondo Finance blog](https://ondo.finance/blog/the-liquidity-advantage-how-ousg-provides-robust-multi-venue-instant-liquidity).*
 
 *¹¹ [Morpho + Coinbase USDC lending](https://morpho.org/blog/morpho-is-now-powering-usdc-lending-on-coinbase/); [Gauntlet on Morpho](https://morpho.org/stories/gauntlet/).*
 
-*¹² [CoinDesk](https://www.coindesk.com/business/2025/09/18/coinbase-adds-usdc-lending-with-morpho-integration/) on Coinbase; [PR Newswire](https://www.prnewswire.com/news-releases/wirex-morpho-and-gauntlet-bring-institutional-defi-yield-to-business-accounts.html) on Wirex; [The Block](https://www.theblock.co/post/386908/kraken-defi-earn-us-eu-canada-yield-bearing-crypto) on Kraken DeFi Earn.*
+*¹² [Blockworks](https://blockworks.com/news/coinbase-usdc-onchain) on Coinbase; [Gauntlet](https://www.gauntlet.xyz/resources/gauntlet-brings-sustainable-defi-yield-to-wirex-business-accounts) on Wirex; [The Block](https://www.theblock.co/post/386908/kraken-defi-earn-us-eu-canada-yield-bearing-crypto) on Kraken DeFi Earn.*
 
 *¹³ [DefiLlama Stablecoins](https://defillama.com/stablecoins).*
 
-*¹⁴ rwa.xyz on-chain holder data, March 8, 2026. Ethena USDtb backed by BUIDL per [Ethena Labs](https://cryptorank.io/news/feed/70e85-ethena-labs-launches-usdtb-backed-by-blackrock); Ondo OUSG per [Ondo Finance](https://ondo.finance/blog/the-liquidity-advantage-how-ousg-provides-robust-multi-channel-liquidity); Sky/Grove per [Sky governance vote](https://vote.sky.money/executive/template-executive-vote-launch-agent-onboarding).*
+*¹⁴ rwa.xyz on-chain holder data, March 8, 2026. Ethena USDtb backed by BUIDL per [USDtb](https://usdtb.money); Ondo OUSG per [Ondo Finance](https://ondo.finance/blog/the-liquidity-advantage-how-ousg-provides-robust-multi-venue-instant-liquidity); Sky/Grove per [Sky governance vote](https://vote.sky.money/executive/template-executive-vote-launch-agent-onboarding).*
