@@ -43,7 +43,7 @@ That concentration is now pushing stablecoin reserves to diversify, pulling high
 
 ## 2. Every Tokenized Asset Faces a Timing Mismatch, and Every Workaround Costs Yield
 
-On-chain capital moves 24/7, settles in seconds, and can be redeployed same-block. Off-chain assets do not. A Treasury bond settles T+1. A private credit loan takes weeks to originate. A real estate deal takes months to close.
+On-chain capital moves 24/7, settles in seconds, and can be redeployed same-block. Off-chain assets cannot. A Treasury bond settles T+1. A private credit loan takes weeks to originate. A real estate deal takes months to close.
 
 Every tokenized asset sits on top of this mismatch. The gap has two sides:
 
