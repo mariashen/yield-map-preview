@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Visual Taxonomy of Yield</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="../taxonomy-data.js?v=5"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0e17;
+    color: #e0e6f0;
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  #header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: linear-gradient(180deg, #0a0e17 0%, #0a0e17 70%, transparent 100%);
+    padding: 16px 24px 32px;
+  }
+
+  #header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #f0f4ff;
+  }
+
+  #header .subtitle {
+    font-size: 12px;
+    color: #6b7a99;
+    margin-top: 4px;
+  }
+
+  #header .definition {
+    font-size: 11px;
+    color: #8899bb;
+    margin-top: 8px;
+    font-style: italic;
+    max-width: 900px;
+    line-height: 1.5;
+  }
+
+  #controls {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    z-index: 101;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  #search-box {
+    background: #141926;
+    border: 1px solid #2a3352;
+    color: #e0e6f0;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    width: 220px;
+    outline: none;
+  }
+
+  #search-box:focus { border-color: #4a7cff; }
+  #search-box::placeholder { color: #4a5678; }
+
+  .btn {
+    background: #141926;
+    border: 1px solid #2a3352;
+    color: #8899bb;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn:hover { background: #1c2440; color: #e0e6f0; }
+  .btn.active { background: #1c2440; border-color: #4a7cff; color: #e0e6f0; }
+
+  select.btn {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 24px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238899bb'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+  }
+
+  #tree-container {
+    width: 100%;
+    height: 100vh;
+    padding-top: 90px;
+  }
+
+  #tree-container svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .node circle { cursor: pointer; stroke-width: 2px; }
+  .node text { font-size: 11px; fill: #c0c8e0; }
+  .node--excluded circle { opacity: 0.35; stroke-dasharray: 3,2; }
+  .node--excluded text { opacity: 0.35; font-style: italic; }
+  .node--root text { font-size: 14px; font-weight: 700; fill: #f0f4ff; }
+  .node--primitive text { font-size: 13px; font-weight: 600; }
+  .node--category text { font-size: 11px; font-weight: 500; }
+  .node--subcategory text { font-size: 11px; font-weight: 400; }
+
+  .link {
+    fill: none;
+    stroke-width: 1.2px;
+    stroke-opacity: 0.4;
+  }
+
+  /* On-chain status ring */
+  .node .status-ring {
+    fill: none;
+    stroke-width: 2px;
+    stroke-opacity: 0.9;
+  }
+
+  #tooltip {
+    position: fixed;
+    background: #141926;
+    border: 1px solid #2a3352;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    max-width: 400px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 200;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    line-height: 1.5;
+  }
+
+  #tooltip .tt-name { font-weight: 600; font-size: 13px; color: #f0f4ff; margin-bottom: 6px; }
+  #tooltip .tt-row { display: flex; gap: 8px; margin-top: 4px; }
+  #tooltip .tt-label { color: #6b7a99; min-width: 70px; }
+  #tooltip .tt-value { color: #c0c8e0; }
+
+  .tt-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
+  .tt-badge--tokenized { background: #1a2e22; color: #3acc8e; }
+  .tt-badge--partial { background: #2a2a1a; color: #ccaa3a; }
+  .tt-badge--not { background: #1a1a22; color: #6b7a99; }
+
+  #legend {
+    position: fixed;
+    bottom: 16px;
+    left: 24px;
+    z-index: 100;
+    background: #141926ee;
+    border: 1px solid #2a3352;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 11px;
+  }
+
+  #legend h3 {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8899bb;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  #stats {
+    position: fixed;
+    bottom: 16px;
+    right: 24px;
+    z-index: 100;
+    font-size: 11px;
+    color: #4a5678;
+    text-align: right;
+  }
+
+  .search-highlight circle { stroke: #ffcc00 !important; stroke-width: 3px !important; }
+  .search-highlight text { fill: #ffcc00 !important; font-weight: 600 !important; }
+  .search-dim { opacity: 0.15; }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <h1>The Visual Taxonomy of Yield</h1>
+  <div class="subtitle" id="subtitle"><span id="primitive-count"></span> Primitives &middot; <span id="source-count"></span> Yield Sources</div>
+  <div class="definition">Yield is the compensation an investor receives for absorbing uncertainty &mdash; by providing capital, granting use of an asset, or assuming the direct risk of adverse outcomes.</div>
+</div>
+
+<div id="controls">
+  <input type="text" id="search-box" placeholder="Search yield sources... (/)">
+  <select class="btn" id="color-mode">
+    <option value="primitive">Color: Primitive</option>
+    <option value="on_chain">Color: On-Chain Status</option>
+  </select>
+  <button class="btn" id="btn-expand">Expand All</button>
+  <button class="btn" id="btn-collapse">Collapse</button>
+  <button class="btn" id="btn-reset">Reset</button>
+</div>
+
+<div id="tree-container"></div>
+
+<div id="tooltip"></div>
+
+<div id="legend">
+  <h3 id="legend-title">Families</h3>
+  <div id="legend-content"></div>
+  <div style="margin-top:10px">
+    <h3>Excluded Sources</h3>
+    <div class="legend-row" style="color:#6b7a99"><span style="opacity:0.35;border:1px dashed #6b7a99;border-radius:50%;display:inline-block;width:10px;height:10px;margin-right:6px"></span> Excluded from analysis (34)</div>
+  </div>
+  <div style="margin-top:10px">
+    <h3>Interactions</h3>
+    <div class="legend-row" style="color:#6b7a99">Click node to expand/collapse</div>
+    <div class="legend-row" style="color:#6b7a99">Hover for details</div>
+    <div class="legend-row" style="color:#6b7a99">Scroll to zoom, drag to pan</div>
+  </div>
+</div>
+
+<div id="stats"></div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+
+const primitiveColors = {
+  lending:   { main: '#60a5fa', bg: '#0f1a33', dark: '#1a3366' },
+  owning:    { main: '#34d399', bg: '#0f2a1a', dark: '#1a4433' },
+  renting:   { main: '#fbbf24', bg: '#2a2a0f', dark: '#44441a' },
+  licensing: { main: '#c084fc', bg: '#1a0f2a', dark: '#2e1a44' },
+  insuring:  { main: '#f87171', bg: '#2a0f0f', dark: '#441a1a' },
+  trading:   { main: '#a78bfa', bg: '#1a0f2a', dark: '#2e1a44' },
+};
+
+const onChainColors = {
+  tokenized:            { main: '#3acc8e', bg: '#0f2a1a', dark: '#1a4433' },
+  partially_tokenized:  { main: '#ccaa3a', bg: '#2a2a0f', dark: '#44441a' },
+  not_tokenized:        { main: '#4a5678', bg: '#0f1118', dark: '#1a1e2e' },
+};
+
+let colorMode = 'primitive';
+
+// ============================================================
+// SETUP
+// ============================================================
+
+// Count leaves
+function countLeaves(node) {
+  if (!node.children) return 1;
+  return node.children.reduce((sum, c) => sum + countLeaves(c), 0);
+}
+
+document.getElementById('source-count').textContent = countLeaves(TAXONOMY_DATA);
+
+// Derive primitive count from tree data (primitives are direct children of root)
+const primitiveNodes = TAXONOMY_DATA.children || [];
+document.getElementById('primitive-count').textContent = primitiveNodes.length;
+
+const container = document.getElementById('tree-container');
+const width = container.clientWidth;
+const height = container.clientHeight;
+const margin = { top: height / 2, left: 120 };
+
+let nodeCount = 0;
+
+const svg = d3.select('#tree-container').append('svg')
+  .attr('width', '100%')
+  .attr('height', '100%');
+
+const g = svg.append('g')
+  .attr('transform', `translate(${margin.left},${margin.top})`);
+
+const zoom = d3.zoom()
+  .scaleExtent([0.1, 4])
+  .on('zoom', (event) => { g.attr('transform', event.transform); });
+
+svg.call(zoom);
+svg.call(zoom.transform, d3.zoomIdentity.translate(margin.left, margin.top).scale(0.55));
+
+const treemap = d3.tree().nodeSize([15, 240]);
+
+const root = d3.hierarchy(TAXONOMY_DATA, d => d.children);
+root.x0 = 0;
+root.y0 = 0;
+
+// Assign primitive down the tree
+root.each(d => {
+  if (d.data.primitive) d.primitive = d.data.primitive;
+  else if (d.parent) d.primitive = d.parent.primitive;
+  else d.primitive = null;
+});
+
+// Collapse below category level initially
+function collapseToLevel(node, maxLevel) {
+  const levels = ['root', 'primitive', 'category'];
+  if (node.children) {
+    node.children.forEach(c => collapseToLevel(c, maxLevel));
+    const lvl = node.data.level || 'leaf';
+    const idx = levels.indexOf(lvl);
+    if (idx >= maxLevel || idx === -1) {
+      node._children = node.children;
+      node.children = null;
+    }
+  }
+}
+collapseToLevel(root, 2);
+
+function getColor(d) {
+  if (colorMode === 'on_chain') {
+    const status = d.data.on_chain || 'not_tokenized';
+    if (d.data.level && d.data.level !== 'leaf') {
+      // For non-leaf nodes in on-chain mode, still use primitive color
+      const prim = d.primitive || 'lending';
+      return primitiveColors[prim] || primitiveColors.lending;
+    }
+    return onChainColors[status] || onChainColors.not_tokenized;
+  }
+  const prim = d.primitive || (d.parent && d.parent.primitive) || 'lending';
+  return primitiveColors[prim] || primitiveColors.lending;
+}
+
+function getNodeRadius(d) {
+  if (d.data.level === 'root') return 10;
+  if (d.data.level === 'primitive') return 8;
+  if (d.data.level === 'category') return 5;
+  if (d.data.level === 'subcategory') return 4;
+  return 3.5;
+}
+
+function update(source) {
+  const treeLayout = treemap(root);
+  const nodes = treeLayout.descendants();
+  const links = treeLayout.descendants().slice(1);
+
+  nodes.forEach(d => { d.y = d.depth * 240; });
+
+  // --- NODES ---
+  const node = g.selectAll('g.node')
+    .data(nodes, d => d.id || (d.id = ++nodeCount));
+
+  const nodeEnter = node.enter().append('g')
+    .attr('class', d => {
+      let cls = 'node';
+      if (d.data.level) cls += ` node--${d.data.level}`;
+      if (d.data.excluded) cls += ' node--excluded';
+      return cls;
+    })
+    .attr('transform', `translate(${source.y0},${source.x0})`)
+    .on('click', (event, d) => {
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      } else if (d._children) {
+        d.children = d._children;
+        d._children = null;
+      }
+      update(d);
+    })
+    .on('mouseenter', (event, d) => showTooltip(event, d))
+    .on('mousemove', (event) => moveTooltip(event))
+    .on('mouseleave', hideTooltip);
+
+  nodeEnter.append('circle')
+    .attr('r', 1e-6)
+    .style('fill', d => (d._children || d.children) ? getColor(d).main : getColor(d).bg)
+    .style('stroke', d => getColor(d).main);
+
+  // On-chain status outer ring for leaf nodes
+  nodeEnter.filter(d => d.data.level === 'leaf' && d.data.on_chain === 'tokenized')
+    .append('circle')
+    .attr('class', 'status-ring')
+    .attr('r', d => getNodeRadius(d) + 3)
+    .style('stroke', '#3acc8e');
+
+  nodeEnter.filter(d => d.data.level === 'leaf' && d.data.on_chain === 'partially_tokenized')
+    .append('circle')
+    .attr('class', 'status-ring')
+    .attr('r', d => getNodeRadius(d) + 3)
+    .style('stroke', '#ccaa3a')
+    .style('stroke-dasharray', '2,2');
+
+  nodeEnter.append('text')
+    .attr('dy', '.35em')
+    .attr('x', d => (d.children || d._children) ? -12 : 12)
+    .attr('text-anchor', d => (d.children || d._children) ? 'end' : 'start')
+    .text(d => d.data.name)
+    .style('fill-opacity', 1e-6);
+
+  // UPDATE
+  const nodeUpdate = nodeEnter.merge(node);
+
+  nodeUpdate.transition().duration(400)
+    .attr('transform', d => `translate(${d.y},${d.x})`);
+
+  nodeUpdate.select('circle:first-child')
+    .attr('r', d => getNodeRadius(d))
+    .style('fill', d => (d._children || d.children) ? getColor(d).main : getColor(d).bg)
+    .style('stroke', d => getColor(d).main)
+    .style('stroke-width', d => d.data.level === 'root' ? 3 : 2)
+    .attr('cursor', d => (d._children || d.children) ? 'pointer' : 'default');
+
+  nodeUpdate.select('text')
+    .style('fill-opacity', 1)
+    .attr('x', d => (d.children || d._children) ? -12 : 12)
+    .attr('text-anchor', d => (d.children || d._children) ? 'end' : 'start');
+
+  // EXIT
+  const nodeExit = node.exit().transition().duration(400)
+    .attr('transform', `translate(${source.y},${source.x})`)
+    .remove();
+
+  nodeExit.select('circle').attr('r', 1e-6);
+  nodeExit.select('text').style('fill-opacity', 1e-6);
+
+  // --- LINKS ---
+  const link = g.selectAll('path.link')
+    .data(links, d => d.id);
+
+  const linkEnter = link.enter().insert('path', 'g')
+    .attr('class', 'link')
+    .style('stroke', d => getColor(d).dark)
+    .attr('d', () => {
+      const o = {x: source.x0, y: source.y0};
+      return diagonal(o, o);
+    });
+
+  const linkUpdate = linkEnter.merge(link);
+
+  linkUpdate.transition().duration(400)
+    .attr('d', d => diagonal(d, d.parent))
+    .style('stroke', d => getColor(d).dark);
+
+  link.exit().transition().duration(400)
+    .attr('d', () => {
+      const o = {x: source.x, y: source.y};
+      return diagonal(o, o);
+    })
+    .remove();
+
+  nodes.forEach(d => {
+    d.x0 = d.x;
+    d.y0 = d.y;
+  });
+
+  updateStats();
+}
+
+function diagonal(s, d) {
+  return `M ${s.y} ${s.x}
+          C ${(s.y + d.y) / 2} ${s.x},
+            ${(s.y + d.y) / 2} ${d.x},
+            ${d.y} ${d.x}`;
+}
+
+// ============================================================
+// TOOLTIP
+// ============================================================
+
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(event, d) {
+  let html = `<div class="tt-name">${d.data.name}</div>`;
+
+  if (d.data.description) {
+    html += `<div style="color:#8899bb;margin-bottom:6px">${d.data.description}</div>`;
+  }
+
+  // On-chain status
+  if (d.data.on_chain) {
+    const statusLabels = {
+      tokenized: 'Tokenized',
+      partially_tokenized: 'Partially Tokenized',
+      not_tokenized: 'Not Tokenized',
+    };
+    const statusClass = d.data.on_chain === 'tokenized' ? 'tokenized' :
+                        d.data.on_chain === 'partially_tokenized' ? 'partial' : 'not';
+    html += `<div class="tt-row"><span class="tt-label">On-chain:</span><span class="tt-badge tt-badge--${statusClass}">${statusLabels[d.data.on_chain]}</span></div>`;
+  }
+
+  // Child count for non-leaf nodes
+  const allChildren = d._children || d.children;
+  if (allChildren) {
+    const total = countDescendantLeaves(d);
+    const collapsed = !!d._children;
+    html += `<div class="tt-row" style="margin-top:4px"><span style="color:#4a5678">${total} sources — click to ${collapsed ? 'expand' : 'collapse'}</span></div>`;
+  }
+
+  // Path
+  const path = d.ancestors().reverse().map(a => a.data.name).join(' > ');
+  html += `<div style="margin-top:6px;font-size:10px;color:#3a4668">${path}</div>`;
+
+  tooltip.innerHTML = html;
+  tooltip.style.opacity = 1;
+  moveTooltip(event);
+}
+
+function countDescendantLeaves(node) {
+  const children = node.children || node._children;
+  if (!children) return 1;
+  return children.reduce((sum, c) => sum + countDescendantLeaves(c), 0);
+}
+
+function moveTooltip(event) {
+  const x = event.clientX + 15;
+  const y = event.clientY - 10;
+  tooltip.style.left = Math.min(x, window.innerWidth - 420) + 'px';
+  tooltip.style.top = Math.min(y, window.innerHeight - 250) + 'px';
+}
+
+function hideTooltip() { tooltip.style.opacity = 0; }
+
+// ============================================================
+// SEARCH
+// ============================================================
+
+const searchBox = document.getElementById('search-box');
+let searchTimeout;
+
+searchBox.addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(doSearch, 200);
+});
+
+function doSearch() {
+  const query = searchBox.value.toLowerCase().trim();
+  g.selectAll('.node').classed('search-highlight', false).classed('search-dim', false);
+  if (!query) return;
+
+  // Also search in collapsed nodes — expand path to matches
+  const allNodes = root.descendants();
+
+  // Collect all nodes (including collapsed) by walking tree
+  function getAllNodes(node) {
+    let result = [node];
+    const children = node.children || node._children;
+    if (children) children.forEach(c => result = result.concat(getAllNodes(c)));
+    return result;
+  }
+
+  const every = getAllNodes(root);
+  const matches = new Set();
+
+  every.forEach(d => {
+    if (d.data.name.toLowerCase().includes(query)) {
+      matches.add(d);
+      let p = d.parent;
+      while (p) {
+        matches.add(p);
+        // Expand collapsed ancestors
+        if (p._children) {
+          p.children = p._children;
+          p._children = null;
+        }
+        p = p.parent;
+      }
+    }
+  });
+
+  if (matches.size > 0) {
+    update(root);
+    // Re-apply highlighting after update
+    setTimeout(() => {
+      g.selectAll('.node').each(function(d) {
+        const el = d3.select(this);
+        if (matches.has(d)) {
+          el.classed('search-highlight', true);
+        } else {
+          el.classed('search-dim', true);
+        }
+      });
+    }, 450);
+  }
+}
+
+// ============================================================
+// COLOR MODE
+// ============================================================
+
+document.getElementById('color-mode').addEventListener('change', (e) => {
+  colorMode = e.target.value;
+  updateLegend();
+  // Re-render to apply colors
+  g.selectAll('.node circle:first-child')
+    .style('fill', d => (d._children || d.children) ? getColor(d).main : getColor(d).bg)
+    .style('stroke', d => getColor(d).main);
+  g.selectAll('path.link')
+    .style('stroke', d => getColor(d).dark);
+});
+
+function buildPrimitiveLegendHTML() {
+  return primitiveNodes.map(p => {
+    const prim = p.data.primitive;
+    const color = (primitiveColors[prim] || primitiveColors.lending).main;
+    return '<div class="legend-row"><div class="legend-dot" style="background:' + color + '"></div> ' + p.data.name + '</div>';
+  }).join('');
+}
+
+function updateLegend() {
+  const title = document.getElementById('legend-title');
+  const content = document.getElementById('legend-content');
+
+  if (colorMode === 'on_chain') {
+    title.textContent = 'On-Chain Status';
+    content.innerHTML =
+      '<div class="legend-row"><div class="legend-dot" style="background:' + onChainColors.tokenized.main + '"></div> Tokenized</div>' +
+      '<div class="legend-row"><div class="legend-dot" style="background:' + onChainColors.partially_tokenized.main + '"></div> Partially Tokenized</div>' +
+      '<div class="legend-row"><div class="legend-dot" style="background:' + onChainColors.not_tokenized.main + '"></div> Not Tokenized</div>';
+  } else {
+    title.textContent = 'Primitives';
+    content.innerHTML = buildPrimitiveLegendHTML();
+  }
+}
+
+// ============================================================
+// BUTTONS
+// ============================================================
+
+document.getElementById('btn-expand').addEventListener('click', () => {
+  function expandAll(d) {
+    if (d._children) { d.children = d._children; d._children = null; }
+    if (d.children) d.children.forEach(expandAll);
+  }
+  expandAll(root);
+  update(root);
+});
+
+document.getElementById('btn-collapse').addEventListener('click', () => {
+  collapseToLevel(root, 2);
+  update(root);
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  searchBox.value = '';
+  g.selectAll('.node').classed('search-highlight', false).classed('search-dim', false);
+  collapseToLevel(root, 2);
+  update(root);
+  svg.transition().duration(500).call(zoom.transform,
+    d3.zoomIdentity.translate(margin.left, margin.top).scale(0.55));
+});
+
+// ============================================================
+// STATS
+// ============================================================
+
+function updateStats() {
+  const visible = root.descendants().length;
+  const total = countDescendantLeaves(root);
+  document.getElementById('stats').innerHTML =
+    `${visible} nodes visible &middot; ${total} yield sources<br>
+     Scroll to zoom &middot; Drag to pan &middot; Click to expand`;
+}
+
+// ============================================================
+// KEYBOARD
+// ============================================================
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== searchBox) {
+    e.preventDefault();
+    searchBox.focus();
+  }
+  if (e.key === 'Escape') {
+    searchBox.blur();
+    searchBox.value = '';
+    g.selectAll('.node').classed('search-highlight', false).classed('search-dim', false);
+  }
+});
+
+// ============================================================
+// INITIAL RENDER
+// ============================================================
+
+updateLegend();
+update(root);
+</script>
+</body>
+</html>
