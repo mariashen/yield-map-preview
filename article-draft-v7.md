@@ -79,75 +79,17 @@ The 34 yield sources with on-chain presence cluster in familiar territory: Treas
 
 **[Download the full 501-source taxonomy (CSV) →][TODO: link]**
 
-### The 433 off-chain yield sources fall into seven groups based on what they need to come on-chain. The full detail on each source is in the CSV. Below, we walk through the seven clusters.
+### The 433 off-chain yield sources fall into seven groups based on what they need to come on-chain. The full detail on each source is in the CSV.
 
-#### 1. Execution infrastructure (68 yield sources)
-
-These are trading strategies where the asset is already electronic. Ethena scaled a crypto basis trade to $6B, but no TradFi carry, options, or arbitrage strategy has scaled on-chain yet. Two paths: bridge vaults to off-chain exchanges, or rebuild strategies natively as more underlying assets are tokenized. Both need vault wrappers, margin engines, oracle feeds, and exchange connectors.
-
-- Carry, basis & yield curve strategies (FX carry, interest rate swaps, basis trades) — 30 yield sources
-- Options & volatility strategies (vol selling, dispersion, straddles, gamma) — 20
-- Arbitrage & structured trading products (stat arb, merger arb, auto-callables, principal-protected) — 18
-
-#### 2. Legal structuring (77 yield sources)
-
-The asset is standardized and well-understood, but creating the compliant on-chain structure is the primary lift: SPV creation, custody arrangements, and regulatory exemption filings. Some adjacent products are already tokenized. Centrifuge has scaled CLOs to over $400M.
-
-- Corporate bonds (IG, high yield, convertible, floating rate, preferred) — 24 yield sources
-- ABS & CLOs (auto loans, credit cards, student loans, managed loan portfolios) — 19
-- Mortgage-backed securities (residential, commercial, agency-guaranteed) — 14
-- US government & agency debt, commercial paper (TIPS, FHLB, agency bonds, CP) — 13
-- MLPs & royalty trusts (energy MLPs, mineral trusts) — 7
-
-#### 3. Cross-border access (55 yield sources)
-
-The asset is wrappable today and demand exists from international investors who cannot access it off-chain. Needs multi-jurisdiction KYC/AML, securities law exemptions (Reg S), withholding tax handling, and cross-border custody infrastructure.
-
-- Public REITs & mREITs (office, residential, data center, healthcare, mortgage) — 25 yield sources
-- Listed alternative funds (closed-end funds, BDCs) — 12
-- International sovereign & supranational debt (gilts, bunds, JGBs, World Bank, EIB) — 11
-- Public equities & dividends (blue chip, international, income funds) — 7
-
-#### 4. Market aggregation (43 yield sources)
-
-Individual deals or issuers are too small or too scattered to tokenize individually. Needs pooling platforms that turn many small things into one investable product. Municipal bonds alone have 50,000+ issuers with no two bonds identical.
-
-- Specialty & asset-based finance (equipment ABL, inventory, receivables, healthcare) — 20 yield sources
-- Municipal bonds (general obligation, revenue, housing, education, hospital) — 12
-- Carbon & environmental markets (carbon credits, RECs, biodiversity) — 7
-- Entertainment & media royalties (music streaming, film/TV, broadcast rights) — 4
-
-#### 5. Specialized origination (96 yield sources)
-
-Each deal requires domain expertise before capital can be deployed. Someone has to assess the specific borrower, property, insurance risk, or project. Needs vertical-specific origination and servicing infrastructure. Re has raised $150M+ in on-chain capital for reinsurance, demonstrating that on-chain capital can flow into products that need specialized origination.
-
-- Infrastructure finance (toll roads, utilities, airports, social infra, PPPs) — 21 yield sources
-- Consumer & marketplace lending (P2P, crowdfunding, point-of-sale, consumer platforms) — 20
-- Cat bonds & ILS (catastrophe bonds, ILS sidecars, retro, industry loss warranties) — 17
-- Corporate, secured & distressed lending (direct loans, fund finance, securities lending, margin) — 14
-- Real estate debt (bridge loans, construction financing, CMBS origination) — 8
-- Energy infrastructure & PPAs (power purchase agreements, grid revenue, renewable projects) — 7
-- Specialty insurance lines (cyber, trade credit, political risk, surety) — 5
-- Life settlements (standard, senior, viatical) — 4
-
-#### 6. Physical-world integration (60 yield sources)
-
-The underlying asset is physical. The common thread is bridging atoms to bits: IoT, oracles, or legal enforcement mechanisms depending on the asset. AI capex may exceed $500B in 2026 alone,² and on-chain capital wants exposure to GPU leasing, data center construction, and energy contracts.
-
-- Oil, gas, mining & timber (working interests, mineral rights, extraction) — 15 yield sources
-- Technology & compute infrastructure (GPU clusters, data centers, cell towers, fiber) — 11
-- Direct real estate & RE-adjacent (commercial, residential, specialty, property data) — 11
-- Transportation leasing (aircraft, railcars, containers, shipping vessels) — 9
-- Agriculture & farmland (row crops, permanent crops, grazing, specialty) — 8
-- Equipment leasing (industrial, medical, construction) — 6
-
-#### 7. Bespoke evaluation (35 yield sources)
-
-Each asset requires individual expert judgment that cannot currently be automated or standardized. But this describes the current state, not a permanent condition. Where digitization creates standardized evaluation (e.g., PSA grading for collectibles, streaming data for music), the barrier collapses and the asset becomes poolable.
-
-- Pharma, tech & commercial IP licensing (drug patents, tech royalties, franchise fees, data licensing) — 15 yield sources
-- Sports, art & niche alternatives (athlete NIL, team revenue, collectibles, niche receivables) — 14
-- Litigation finance (commercial, class action, portfolio, IP disputes) — 6
+| Barrier | <div style="min-width:350px">Categories (# of yield sources)</div> | <div style="min-width:350px">Core challenge</div> | What's needed |
+|---|---|---|---|
+| **Execution infrastructure** | <ul><li>Carry, basis & yield curve strategies (30)</li><li>Options & volatility strategies (20)</li><li>Arbitrage & structured trading products (18)</li></ul> | These are trading strategies where the asset is already electronic. Ethena scaled a crypto basis trade to $6B, but no TradFi carry, options, or arbitrage strategy has scaled on-chain yet. Two paths: bridge vaults to off-chain exchanges, or rebuild strategies natively as more underlying assets are tokenized. | Vault wrappers, margin engines, oracle feeds, and exchange connectors |
+| **Legal structuring** | <ul><li>Corporate bonds (24)</li><li>ABS & CLOs (19)</li><li>Mortgage-backed securities (14)</li><li>US government & agency debt, commercial paper (13)</li><li>MLPs & royalty trusts (7)</li></ul> | The asset is standardized and well-understood, but creating the compliant on-chain structure is the primary lift. Some adjacent products are already tokenized. Centrifuge has scaled CLOs to over $400M. | SPV creation, custody arrangements, and regulatory exemption filings |
+| **Cross-border access** | <ul><li>Public REITs & mREITs (25)</li><li>Listed alternative funds (12)</li><li>International sovereign & supranational debt (11)</li><li>Public equities & dividends (7)</li></ul> | The asset is wrappable today and demand exists from international investors who cannot access it off-chain. | Multi-jurisdiction KYC/AML, securities law exemptions (Reg S), withholding tax handling, and cross-border custody infrastructure |
+| **Market aggregation** | <ul><li>Specialty & asset-based finance (20)</li><li>Municipal bonds (12)</li><li>Carbon & environmental markets (7)</li><li>Entertainment & media royalties (4)</li></ul> | Individual deals or issuers are too small or too scattered to tokenize individually. Municipal bonds alone have 50,000+ issuers with no two bonds identical. | Pooling platforms that turn many small things into one investable product |
+| **Specialized origination** | <ul><li>Infrastructure finance (21)</li><li>Consumer & marketplace lending (20)</li><li>Cat bonds & ILS (17)</li><li>Corporate, secured & distressed lending (14)</li><li>Real estate debt (8)</li><li>Energy infrastructure & PPAs (7)</li><li>Specialty insurance lines (5)</li><li>Life settlements (4)</li></ul> | Each deal requires domain expertise before capital can be deployed. Someone has to assess the specific borrower, property, insurance risk, or project. Re has raised $150M+ in on-chain capital for reinsurance, demonstrating that on-chain capital can flow into products that need specialized origination. | Vertical-specific origination and servicing infrastructure |
+| **Physical-world integration** | <ul><li>Oil, gas, mining & timber (15)</li><li>Technology & compute infrastructure (11)</li><li>Direct real estate & RE-adjacent (11)</li><li>Transportation leasing (9)</li><li>Agriculture & farmland (8)</li><li>Equipment leasing (6)</li></ul> | The underlying asset is physical. The common thread is bridging atoms to bits: IoT, oracles, or legal enforcement mechanisms depending on the asset. AI capex may exceed $500B in 2026 alone,² and on-chain capital wants exposure to GPU leasing, data center construction, and energy contracts. | IoT, oracles, or legal enforcement mechanisms depending on the asset |
+| **Bespoke evaluation** | <ul><li>Pharma, tech & commercial IP licensing (15)</li><li>Sports, art & niche alternatives (14)</li><li>Litigation finance (6)</li></ul> | Each asset requires individual expert judgment that cannot currently be automated or standardized. But this describes the current state, not a permanent condition. Where digitization creates standardized evaluation (e.g., PSA grading for collectibles, streaming data for music), the barrier collapses and the asset becomes poolable. | Digitization that creates standardized evaluation |
 
 **[Download the full 501-source taxonomy (CSV) →][TODO: link]**
 
