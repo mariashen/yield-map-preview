@@ -28,11 +28,13 @@ Stablecoin supply used to track inversely with the fed funds rate, growing past 
 
 [chart:stablecoin-rates]
 *Stablecoin supply tracked inversely with the fed funds rate until January 2024, when the two decoupled.*
+*Data: [DeFiLlama Stablecoins](https://defillama.com/stablecoins), [Federal Reserve Economic Data (FRED)](https://fred.stlouisfed.org/series/FEDFUNDS).*
 
 What changed was that the risk-free rate appeared on-chain.¹ Starting in 2023 with Ondo and expanding through 2024 with BlackRock and Centrifuge, issuers began offering Treasury yield as on-chain tokens. For the first time, stablecoin holders didn't need to leave crypto to earn the risk-free rate.
 
 [chart:yield-vs-date]
-*Yield-bearing RWAs by launch date. Bubble size reflects total asset value. The largest assets cluster in the 3-5% yield band. Newer, smaller launches push up the yield curve.*
+*Yield-bearing RWAs by launch date. Bubble size reflects total asset value. The largest assets cluster in the 3-5% yield band. Newer, smaller launches push up the yield curve. Solid borders = 7-day trailing APY; dashed borders = stated target APY (see Methodology).*
+*Data: [rwa.xyz](https://app.rwa.xyz) 7-day trailing APY and inception dates, [DeFiLlama Yields API](https://yields.llama.fi/pools), protocol documentation.*
 
 Treasuries are now the largest RWA category at ~$11B. The same dynamic pulled other debt instruments on-chain: private credit ($2.8B), corporate bonds ($1.9B), non-U.S. government debt ($1.1B). The market is concentrated: the top 10 assets hold 64% of total value, and 18 of the largest offer yields between 3% and 5%.
 
@@ -76,6 +78,7 @@ The 34 yield sources with on-chain presence cluster in familiar territory: Treas
 
 [chart:taxonomy]
 *501 yield sources across 15 categories (34 sources excluded from analysis, see Methodology). 93% of the analytical set have not reached meaningful scale on-chain.*
+*Data: Electric Capital primary research, [rwa.xyz](https://app.rwa.xyz) distributed assets for on-chain status.*
 
 **[Download the full 501-source taxonomy (CSV) →][TODO: link]**
 
@@ -198,6 +201,8 @@ If you are building the next layer, we want to talk.
 *On-chain status was determined by mapping all 727 distributed assets tracked by rwa.xyz to their corresponding yield sources in our taxonomy, supplemented by on-chain products rwa.xyz does not track (DePIN protocols, carbon credit platforms, music royalty tokens). A source is tokenized if at least one mapped product has $50M or more on-chain, partially tokenized if on-chain products exist but all fall below $50M, and not tokenized if no on-chain product exists. Tokenized commodities (gold, silver) and private equity were excluded from yield source mapping because they do not generate yield. Tokenized stocks were capped at partially tokenized because dividend passthrough is not yet automated on-chain.*
 
 *Every inception date in the launch timeline chart was verified against at least one independent source: protocol press releases, on-chain contract deployment timestamps, SEC filings, or financial news coverage. Three assets were removed because their launch dates could not be independently corroborated: PKH2 (a Liquid Network mining note with no public block explorer), BELIF (a Bosera segregated portfolio with limited press coverage), and CFSRS (a recently launched Hong Kong fund with no independent coverage at time of publication). All three remain in the underlying dataset and appear in other charts.*
+
+*Charts that show yield include only yield-bearing assets above $50M. Non-yield stablecoins and appreciation-only assets are excluded entirely. For 32 of these assets (92% of yield-bearing value), we report a verified 7-day trailing APY from one of three programmatic sources: [rwa.xyz](https://app.rwa.xyz) on-chain NAV (16 assets), the [DeFiLlama Yields API](https://yields.llama.fi/pools) native staking pools (12 assets), or protocol-specific APIs — [Centrifuge GraphQL](https://api.centrifuge.io) (3 assets), [Re protocol](https://api.re.xyz/apy/get-apy) (1 asset), and [Superstate](https://superstate.com/assets/uscc) (1 asset). The remaining 21 assets lack a reliable trailing yield source. Rather than exclude them — which would hide exactly the higher-yield assets founders are trying to bring on-chain — we display their stated target APYs from fund documentation, protocol websites, or rwa.xyz asset profiles. These are not trailing returns and should not be compared directly to 7-day figures. They appear on charts with distinctly different visual treatment (dimmed, dashed borders) and are labeled as targets in every tooltip. We include them solely to show the yield spectrum that tokenization is reaching for, not to imply equivalence with verified trailing data.*
 
 *All aggregate market figures use rwa.xyz distributed values as of March 8, 2026. Stablecoin market capitalization is reported from both rwa.xyz (~$301B) and DeFiLlama (~$313B).*
 

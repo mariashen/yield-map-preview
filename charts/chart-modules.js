@@ -5,6 +5,103 @@
 
 const CHARTS = {};
 
+// ── Yield display helpers ───────────────────────────────────
+
+// Does this asset have a verified 7d trailing APY?
+function has7d(d) { return d.yield_7d != null && d.yield_7d !== 0; }
+
+// Best yield for plotting: use 7d if available, fall back to stated target
+function plotYield(d) {
+  if (has7d(d)) return d.yield_7d;
+  if (d.yield_stated != null && d.yield_stated !== 0) return d.yield_stated;
+  return d.yield_pct || 0;
+}
+
+// Is this asset using a target (not 7d) for its plot position?
+function isTargetOnly(d) { return !has7d(d) && d.yield_stated != null && d.yield_stated !== 0; }
+
+// Description lines for afterBody — first sentence only
+function descLines(m) {
+  if (!m.description) return [];
+  // Protect common abbreviations from false sentence breaks
+  var d = m.description
+    .replace(/U\.S\./g, 'U\x00S\x00').replace(/Ltd\./g, 'Ltd\x00').replace(/Inc\./g, 'Inc\x00')
+    .replace(/Corp\./g, 'Corp\x00').replace(/No\./g, 'No\x00').replace(/Pte\./g, 'Pte\x00')
+    .replace(/etc\./g, 'etc\x00').replace(/vs\./g, 'vs\x00').replace(/i\.e\./g, 'i\x00e\x00')
+    .replace(/e\.g\./g, 'e\x00g\x00').replace(/Dr\./g, 'Dr\x00').replace(/St\./g, 'St\x00');
+  // Find first real sentence end: period/exclamation followed by space
+  var match = d.match(/^.+?[.!]\s/);
+  var text = match ? match[0].trim() : d.match(/^[^.!]+[.!]/) ? d.match(/^[^.!]+[.!]/)[0] : d;
+  // Restore periods
+  text = text.replace(/\x00/g, '.');
+  if (text.length > 250) text = text.substring(0, 247) + '...';
+  return [''].concat(wrapText(text, 60));
+}
+
+// Full tooltip block for yield info
+function yieldTooltipLines(m) {
+  var lines = [];
+  var h7d = has7d(m);
+  var hasStated = m.yield_stated != null && m.yield_stated !== 0;
+
+  // Yield figures — always show both lines for consistency
+  if (h7d && hasStated) {
+    lines.push('7-day APY: ' + fmtPct(m.yield_7d) + '  \u00b7  Target: ' + fmtPct(m.yield_stated));
+  } else if (h7d) {
+    lines.push('7-day APY: ' + fmtPct(m.yield_7d));
+  } else if (hasStated) {
+    lines.push('7-day APY: N/A  \u00b7  Target: ' + fmtPct(m.yield_stated));
+  }
+
+  // Source
+  var label = m.yield_label || '';
+  if (label && label !== 'Non-yield-bearing' && label !== 'No cash yield (appreciation only)') {
+    lines.push('Source: ' + label);
+  }
+
+  return lines;
+}
+
+// Short yield label for first tooltip line
+function yieldLabel(m) {
+  if (has7d(m)) return fmtPct(m.yield_7d) + ' (7d APY)';
+  if (m.yield_stated != null && m.yield_stated !== 0) return fmtPct(m.yield_stated) + ' (target)';
+  if (m.yield_pct > 0) return fmtPct(m.yield_pct);
+  return '\u2014';
+}
+
+// Chart.js plugin: visually distinguish target-only bubbles
+// Draws a dark overlay to dim them + dashed white border
+var dashedBorderPlugin = {
+  id: 'dashedBorder',
+  afterDatasetsDraw: function(chart) {
+    var ctx = chart.ctx;
+    chart.data.datasets.forEach(function(dataset, di) {
+      var meta = chart.getDatasetMeta(di);
+      meta.data.forEach(function(el, i) {
+        var d = dataset.data[i];
+        if (d && d._meta && isTargetOnly(d._meta)) {
+          var r = el.options.radius || el.width / 2;
+          ctx.save();
+          // Dark overlay to dim the bubble (~50% dimmer)
+          ctx.beginPath();
+          ctx.arc(el.x, el.y, r, 0, 2 * Math.PI);
+          ctx.fillStyle = 'rgba(10, 14, 23, 0.55)';
+          ctx.fill();
+          // Dashed white border
+          ctx.beginPath();
+          ctx.arc(el.x, el.y, r, 0, 2 * Math.PI);
+          ctx.setLineDash([4, 3]);
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.restore();
+        }
+      });
+    });
+  }
+};
+
 // ── Shared helpers ──────────────────────────────────────────
 
 let _uid = 0;
@@ -247,9 +344,14 @@ var LAUNCH_DATE_EXCLUDED_TICKERS = new Set(['PKH2', 'BELIF', 'CFSRS']);
 
 CHARTS['yield-vs-date'] = function(container) {
   var s = scaffold(container, { title: 'Yield-Bearing Assets by Launch Date' });
+  // Add legend note for dashed borders
+  var note = document.createElement('div');
+  note.style.cssText = 'font-size:11px;color:#94a3b8;text-align:center;padding:2px 0 6px;';
+  note.innerHTML = 'Solid border = 7-day trailing APY &nbsp;\u00b7&nbsp; <span style="border-bottom:2px dashed rgba(255,255,255,0.6);padding-bottom:1px">Dashed border</span> = stated target APY (not trailing)';
+  s.filtersEl.parentNode.insertBefore(note, s.filtersEl.nextSibling);
   var LAUNCH_COLORS = Object.assign({}, COLORS, { 'Stablecoins with RWA Yield': COLORS['Stablecoins'] });
   var renCls = function(c) { return c === 'Stablecoins' ? 'Stablecoins with RWA Yield' : c; };
-  var items = DATA.filter(function(d) { return parseDate(d.inception_date) && !LAUNCH_DATE_EXCLUDED_TICKERS.has(d.ticker); })
+  var items = DATA.filter(function(d) { return parseDate(d.inception_date) && !LAUNCH_DATE_EXCLUDED_TICKERS.has(d.ticker) && plotYield(d) > 0; })
     .map(function(d) { return Object.assign({}, d, { date: parseDate(d.inception_date) }); });
   var classes = Array.from(new Set(items.map(function(d) { return renCls(d.asset_class); }))).sort();
   var allValues = items.map(function(d) { return d.value_usd; });
@@ -261,7 +363,7 @@ CHARTS['yield-vs-date'] = function(container) {
       return {
         label: cls,
         data: filtered.filter(function(d) { return renCls(d.asset_class) === cls; }).map(function(d) {
-          return { x: d.date, y: d.yield_pct, r: bubbleRadius(d.value_usd, allValues, 4, 35), _meta: d };
+          return { x: d.date, y: plotYield(d), r: bubbleRadius(d.value_usd, allValues, 4, 35), _meta: d };
         }),
         backgroundColor: (LAUNCH_COLORS[cls] || '#888') + 'aa',
         borderColor: LAUNCH_COLORS[cls] || '#888',
@@ -289,18 +391,16 @@ CHARTS['yield-vs-date'] = function(container) {
             title: function(ctx) { return ctx[0].raw._meta.name; },
             label: function(ctx) {
               var m = ctx.raw._meta;
-              var lines = [m.ticker + ': ' + fmtPct(m.yield_pct) + ' yield \u00b7 ' + fmtUSD(m.value_usd)];
-              if (m.yield_source) {
-                var src = 'Source: ' + m.yield_source;
-                if (m.yield_confidence === 'Low') src += ' \u00b7 \u26a0 Low confidence';
-                lines.push(src);
-              }
+              var lines = [m.ticker + ': ' + yieldLabel(m) + ' \u00b7 ' + fmtUSD(m.value_usd)];
+              lines.push.apply(lines, yieldTooltipLines(m));
               return lines;
             },
+            afterBody: function(ctx) { return descLines(ctx[0].raw._meta); },
           } },
           legend: LEGEND_BOTTOM,
         },
       },
+      plugins: [dashedBorderPlugin],
     });
   }
 
@@ -374,11 +474,13 @@ CHARTS['scale-speed-risk'] = function(container) {
             title: function(ctx) { return ctx[0].raw._meta.name; },
             label: function(ctx) {
               var m = ctx.raw._meta, b = getRiskBucket(m.risk_score);
-              return [m.ticker + ': ' + fmtUSD(m.value_usd) + ' \u00b7 ' + m.yield_pct + '% yield',
+              var lines = [m.ticker + ': ' + fmtUSD(m.value_usd) + ' \u00b7 ' + yieldLabel(m),
                       'Scale: ' + m.scale_score + '/10 \u00b7 Deployment Speed: ' + m.speed_score + '/10 \u00b7 Risk: ' + m.risk_score + '/10 (' + b.label + ')'];
+              lines.push.apply(lines, yieldTooltipLines(m));
+              return lines;
             },
             afterBody: function(ctx) {
-              var m = ctx[0].raw._meta, lines = [];
+              var m = ctx[0].raw._meta, lines = descLines(m);
               if (m.risk_rationale) { lines.push('', 'Risk:', ...wrapText(m.risk_rationale, 55)); }
               if (m.speed_rationale) { lines.push('', 'Deployment Speed:', ...wrapText(m.speed_rationale, 55)); }
               if (m.scale_rationale) { lines.push('', 'Scale:', ...wrapText(m.scale_rationale, 55)); }
@@ -387,7 +489,7 @@ CHARTS['scale-speed-risk'] = function(container) {
           } },
         },
       },
-      plugins: [quadrantPlugin(), bubbleLabelsPlugin()],
+      plugins: [quadrantPlugin(), bubbleLabelsPlugin(), dashedBorderPlugin],
     });
   }
   render(activeRisks);
@@ -433,11 +535,13 @@ CHARTS['scale-speed-individual'] = function(container) {
             title: function(ctx) { return ctx[0].raw._meta.name; },
             label: function(ctx) {
               var m = ctx.raw._meta;
-              return [m.ticker + ': ' + fmtUSD(m.value_usd) + ' \u00b7 ' + m.yield_pct + '% yield',
+              var lines = [m.ticker + ': ' + fmtUSD(m.value_usd) + ' \u00b7 ' + yieldLabel(m),
                       'Scale: ' + m.scale_score + '/10 \u00b7 Deployment Speed: ' + m.speed_score + '/10'];
+              lines.push.apply(lines, yieldTooltipLines(m));
+              return lines;
             },
             afterBody: function(ctx) {
-              var m = ctx[0].raw._meta, lines = [];
+              var m = ctx[0].raw._meta, lines = descLines(m);
               if (m.speed_rationale) { lines.push('', 'Deployment Speed:', ...wrapText(m.speed_rationale, 55)); }
               if (m.scale_rationale) { lines.push('', 'Scale:', ...wrapText(m.scale_rationale, 55)); }
               return lines;
@@ -445,7 +549,7 @@ CHARTS['scale-speed-individual'] = function(container) {
           } },
         },
       },
-      plugins: [quadrantPlugin(), bubbleLabelsPlugin()],
+      plugins: [quadrantPlugin(), bubbleLabelsPlugin(), dashedBorderPlugin],
     });
   }
   buildFilters(s.filtersEl, classes, CLASS_COLORS_EXT, render);
@@ -595,7 +699,7 @@ CHARTS['scale-speed-quadrant'] = function(container) {
 
 CHARTS['holders-vs-yield'] = function(container) {
   var s = scaffold(container, { title: 'Holders vs. Yield' });
-  var items = DATA.filter(function(d) { return d.holders != null && d.yield_pct != null && d.yield_pct > 0; });
+  var items = DATA.filter(function(d) { return d.holders != null && plotYield(d) > 0; });
   var classes = Array.from(new Set(items.map(function(d) { return d.asset_class; }))).sort();
   var allValues = items.map(function(d) { return d.value_usd; });
   var chart, useLog = true;
@@ -610,7 +714,7 @@ CHARTS['holders-vs-yield'] = function(container) {
       return {
         label: cls,
         data: filtered.filter(function(d) { return d.asset_class === cls; }).map(function(d) {
-          return { x: d.holders, y: d.yield_pct, r: bubbleRadius(d.value_usd, allValues, 4, 45), _meta: d };
+          return { x: d.holders, y: plotYield(d), r: bubbleRadius(d.value_usd, allValues, 4, 45), _meta: d };
         }),
         backgroundColor: (COLORS[cls] || '#888') + 'aa', borderColor: COLORS[cls] || '#888', borderWidth: 1,
       };
@@ -637,12 +741,10 @@ CHARTS['holders-vs-yield'] = function(container) {
               var m = ctx.raw._meta;
               var h = m.holders >= 1e6 ? (m.holders/1e6).toFixed(1)+'M' : m.holders >= 1e3 ? (m.holders/1e3).toFixed(1)+'K' : m.holders;
               var t10 = m.top_10_holder_pct != null ? ' \u00b7 Top-10 own ' + fmtPct(m.top_10_holder_pct) : '';
-              return m.ticker + ': ' + fmtPct(m.yield_pct) + ' yield \u00b7 ' + h + ' holders' + t10 + ' \u00b7 ' + fmtUSD(m.value_usd);
+              return m.ticker + ': ' + yieldLabel(m) + ' \u00b7 ' + h + ' holders' + t10 + ' \u00b7 ' + fmtUSD(m.value_usd);
             },
             afterBody: function(ctx) {
-              var m = ctx[0].raw._meta, lines = [];
-              if (m.yield_category) lines.push('Yield type: ' + m.yield_category);
-              if (m.description) { lines.push(''); lines.push.apply(lines, wrapText(m.description)); }
+              var m = ctx[0].raw._meta, lines = descLines(m);
               return lines;
             },
           } },
@@ -713,7 +815,7 @@ CHARTS['holders-concentration'] = function(container) {
               var h = m.holders >= 1e6 ? (m.holders/1e6).toFixed(1)+'M' : m.holders >= 1e3 ? (m.holders/1e3).toFixed(1)+'K' : m.holders;
               return m.ticker + ': ' + h + ' holders \u00b7 Top-10 own ' + fmtPct(m.top_10_holder_pct) + ' \u00b7 ' + fmtUSD(m.value_usd);
             },
-            afterBody: function(ctx) { return [''].concat(wrapText(ctx[0].raw._meta.description)); },
+            afterBody: function(ctx) { return descLines(ctx[0].raw._meta); },
           } },
         },
       },
@@ -793,18 +895,18 @@ CHARTS['holders-value-savings'] = function(container) {
             label: function(ctx) {
               var m = ctx.raw._meta, lines = [];
               var fmtH = function(n) { return n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : n.toLocaleString(); };
-              if (m.has_override) { lines.push('Savings holders (' + m.savings_token + '): ' + fmtH(m.display_holders)); lines.push('Base holders (' + m.ticker + '): ' + fmtH(m.base_holders)); }
-              else { lines.push('Holders: ' + fmtH(m.display_holders)); }
-              lines.push('Value: ' + fmtUSD(m.value_usd));
-              if (m.yield_pct > 0) lines.push('Yield: ' + fmtPct(m.yield_pct));
-              if (m.yield_source) {
-                var src = 'Source: ' + m.yield_source;
-                if (m.yield_confidence === 'Low') src += ' \u00b7 \u26a0 Low confidence';
-                lines.push(src);
+              lines.push(m.ticker + ': ' + fmtUSD(m.value_usd));
+              if (m.has_override) {
+                lines.push('Staking holders (' + m.savings_token + '): ' + fmtH(m.display_holders));
+                lines.push('Base holders (' + m.ticker + '): ' + fmtH(m.base_holders));
+              } else {
+                lines.push('Holders: ' + fmtH(m.display_holders));
               }
+              if (m.top_10_holder_pct != null) lines.push('Top 10 hold: ' + fmtPct(m.top_10_holder_pct));
+              lines.push.apply(lines, yieldTooltipLines(m));
               return lines;
             },
-            afterBody: function(ctx) { var m = ctx[0].raw._meta; return m.description ? [''].concat(wrapText(m.description)) : []; },
+            afterBody: function(ctx) { return descLines(ctx[0].raw._meta); },
           } },
         },
       },
@@ -864,12 +966,13 @@ CHARTS['holders-value'] = function(container) {
             label: function(ctx) {
               var m = ctx.raw._meta, lines = [];
               var fmtH = function(n) { return n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : n.toLocaleString(); };
+              lines.push(m.ticker + ': ' + fmtUSD(m.value_usd));
               lines.push('Holders: ' + fmtH(m.holders));
-              lines.push('Value: ' + fmtUSD(m.value_usd));
-              if (m.yield_pct > 0) lines.push('Yield: ' + fmtPct(m.yield_pct));
+              if (m.top_10_holder_pct != null) lines.push('Top 10 hold: ' + fmtPct(m.top_10_holder_pct));
+              lines.push.apply(lines, yieldTooltipLines(m));
               return lines;
             },
-            afterBody: function(ctx) { var m = ctx[0].raw._meta; return m.description ? [''].concat(wrapText(m.description)) : []; },
+            afterBody: function(ctx) { return descLines(ctx[0].raw._meta); },
           } },
         },
       },
@@ -923,11 +1026,11 @@ CHARTS['scale-speed-yield'] = function(container) {
 
   var chart;
   function render(activeYields) {
-    var filtered = items.filter(function(d) { return activeYields.has(getYieldBucket(d.yield_pct).label); });
+    var filtered = items.filter(function(d) { return activeYields.has(getYieldBucket(plotYield(d)).label); });
     var datasets = YIELD_BUCKETS.filter(function(b) { return activeYields.has(b.label); }).map(function(bucket) {
       return {
         label: bucket.label,
-        data: filtered.filter(function(d) { return getYieldBucket(d.yield_pct).label === bucket.label; }).map(function(d) {
+        data: filtered.filter(function(d) { return getYieldBucket(plotYield(d)).label === bucket.label; }).map(function(d) {
           return { x: d.scaleScore + jitter(d.ticker, 'x'), y: d.speedScore + jitter(d.ticker, 'y'), r: Math.max(4, 4 + 26 * Math.sqrt(d.value_usd / maxValue)), _meta: d };
         }),
         backgroundColor: bucket.color + '66', borderColor: bucket.color, borderWidth: 1.5,
@@ -946,12 +1049,14 @@ CHARTS['scale-speed-yield'] = function(container) {
             title: function(ctx) { return ctx[0].raw._meta.name; },
             label: function(ctx) {
               var m = ctx.raw._meta, bucket = getYieldBucket(m.yield_pct);
-              return [m.ticker + ': ' + fmtUSD(m.value_usd) + ' \u00b7 ' + m.yield_pct + '% yield',
+              var lines = [m.ticker + ': ' + fmtUSD(m.value_usd) + ' \u00b7 ' + yieldLabel(m),
                       'Scale: ' + m.scale_score + '/10 \u00b7 Deployment Speed: ' + m.speed_score + '/10',
                       'Yield band: ' + bucket.label];
+              lines.push.apply(lines, yieldTooltipLines(m));
+              return lines;
             },
             afterBody: function(ctx) {
-              var m = ctx[0].raw._meta, lines = [];
+              var m = ctx[0].raw._meta, lines = descLines(m);
               if (m.speed_rationale) { lines.push('', 'Deployment Speed:', ...wrapText(m.speed_rationale, 55)); }
               if (m.scale_rationale) { lines.push('', 'Scale:', ...wrapText(m.scale_rationale, 55)); }
               return lines;
@@ -959,7 +1064,7 @@ CHARTS['scale-speed-yield'] = function(container) {
           } },
         },
       },
-      plugins: [quadrantPlugin(), bubbleLabelsPlugin()],
+      plugins: [quadrantPlugin(), bubbleLabelsPlugin(), dashedBorderPlugin],
     });
   }
   render(activeYields);
