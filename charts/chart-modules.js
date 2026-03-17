@@ -287,7 +287,16 @@ CHARTS['yield-vs-date'] = function(container) {
           } } },
           tooltip: { callbacks: {
             title: function(ctx) { return ctx[0].raw._meta.name; },
-            label: function(ctx) { var m = ctx.raw._meta; return m.ticker + ': ' + fmtPct(m.yield_pct) + ' yield \u00b7 ' + fmtUSD(m.value_usd); },
+            label: function(ctx) {
+              var m = ctx.raw._meta;
+              var lines = [m.ticker + ': ' + fmtPct(m.yield_pct) + ' yield \u00b7 ' + fmtUSD(m.value_usd)];
+              if (m.yield_source) {
+                var src = 'Source: ' + m.yield_source;
+                if (m.yield_confidence === 'Low') src += ' \u00b7 \u26a0 Low confidence';
+                lines.push(src);
+              }
+              return lines;
+            },
           } },
           legend: LEGEND_BOTTOM,
         },
@@ -788,6 +797,11 @@ CHARTS['holders-value-savings'] = function(container) {
               else { lines.push('Holders: ' + fmtH(m.display_holders)); }
               lines.push('Value: ' + fmtUSD(m.value_usd));
               if (m.yield_pct > 0) lines.push('Yield: ' + fmtPct(m.yield_pct));
+              if (m.yield_source) {
+                var src = 'Source: ' + m.yield_source;
+                if (m.yield_confidence === 'Low') src += ' \u00b7 \u26a0 Low confidence';
+                lines.push(src);
+              }
               return lines;
             },
             afterBody: function(ctx) { var m = ctx[0].raw._meta; return m.description ? [''].concat(wrapText(m.description)) : []; },

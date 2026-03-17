@@ -8,15 +8,15 @@
 
 We mapped 501 sources of real-world yield and cross-referenced them against the RWAs with traction on-chain today.
 
-**Stablecoin demand pulled Treasuries on-chain first, and now Treasury concentration is pulling higher-yield assets after them.** Treasuries are the largest RWA category because dollars on-chain needed the risk-free rate once rates started climbing in 2022. The concentration in low-yield Treasuries is now pushing stablecoin reserves to diversify into higher-yield, less correlated assets. Bringing those assets on-chain is harder.
+**1. Stablecoin demand pulled Treasuries on-chain first, and now Treasury concentration is pulling higher-yield assets after them.** Treasuries are the largest RWA category because dollars on-chain needed the risk-free rate once rates started climbing in 2022. The concentration in low-yield Treasuries is now pushing stablecoin reserves to diversify into higher-yield, less correlated assets. Bringing those assets on-chain is harder.
 
-**Three strategies make higher-yield assets feel instant, but they all drag returns toward the risk-free rate.** Higher-yield assets are slow to deploy and slow to redeem. Today's workarounds — parking idle capital in liquid assets, socializing yield across a pool, and getting liquidity from third parties instead of redeeming — all compress yield. There is opportunity in building new strategies that preserve the yield premium above Treasuries.
+**2. Three strategies make higher-yield assets feel instant, but they all drag returns toward the risk-free rate.** Higher-yield assets are slow to deploy and slow to redeem. Today's workarounds — parking idle capital in liquid assets, socializing yield across a pool, and getting liquidity from third parties instead of redeeming — all compress yield. There is opportunity in building new strategies that preserve the yield premium above Treasuries.
 
-**Tokenizable yield is abundant. Seven clusters of opportunity explain what can be unlocked on-chain.** Of the 501 yield sources we mapped, only 34 have reached meaningful scale on-chain. The rest cluster into seven groups by what keeps them off-chain: legal structuring, cross-border access, market aggregation, specialized origination, physical-world integration, execution infrastructure, and bespoke evaluation.
+**3. Tokenizable yield is abundant. Seven clusters of opportunity explain what can be unlocked on-chain.** Of the 501 yield sources we mapped, only 34 have reached meaningful scale on-chain. The rest cluster into seven groups by what keeps them off-chain: legal structuring, cross-border access, market aggregation, specialized origination, physical-world integration, execution infrastructure, and bespoke evaluation.
 
-**The biggest challenge is distribution.** Of 35 yield-bearing non-stablecoin RWAs above $50M, only two have crossed 2,000 holders, much of that by design. Three strategies have emerged: partner with deployers and vault curators, own a yield-bearing stablecoin, or embed in apps that reach users directly. Today, the first dominates. The products that scale will either own their distribution or become infrastructure the distribution layer cannot replace.
+**4. The biggest challenge is distribution.** Of 35 yield-bearing non-stablecoin RWAs above $50M, only two have crossed 2,000 holders, much of that by design. Three strategies have emerged: partner with deployers and vault curators, own a yield-bearing stablecoin, or embed in apps that reach users directly. Today, the first dominates. The products that scale will either own their distribution or become infrastructure the distribution layer cannot replace.
 
-**Five forces are pulling more assets on-chain despite the frictions.** On-chain capital is sticky: two-thirds of stablecoin supply stayed even before the risk-free rate existed. Now that the base has grown to over $300B, the largest protocols are concentrated in the same handful of Treasury products and need to diversify into uncorrelated, higher-yield assets. Each new layer of infrastructure, from vaults to tranching to leverage, makes it easier to bring those assets on-chain and multiplies the demand for them once they arrive.
+**5. Five forces are pulling more assets on-chain despite the frictions.** On-chain capital is sticky: two-thirds of stablecoin supply stayed even before the risk-free rate existed. Now that the base has grown to over $300B, the largest protocols are concentrated in the same handful of Treasury products and need to diversify into uncorrelated, higher-yield assets. Each new layer of infrastructure, from vaults to tranching to leverage, makes it easier to bring those assets on-chain and multiplies the demand for them once they arrive.
 
 Founders have the opportunity to bring hard-to-tokenize assets on-chain, own their distribution, or build the infrastructure layer that everything else plugs into. If you are building any of these, we want to talk.
 
@@ -55,13 +55,13 @@ Treasuries are the fastest off-chain asset class and still need workarounds to f
 
 Three strategies bridge the timing gap today. All redistribute the cost of illiquidity to whoever is willing to bear it: the fund (buffer), a lender (collateral), or a market maker (spread).
 
-**1. Park idle capital in liquid assets.** Keep a portion of the pool in lower-yielding but instantly accessible positions. New deposits earn immediately instead of sitting idle during origination, and withdrawals get funded without waiting for underlying assets to mature. There are two variants:
+**A. Park idle capital in liquid assets.** Keep a portion of the pool in lower-yielding but instantly accessible positions. New deposits earn immediately instead of sitting idle during origination, and withdrawals get funded without waiting for underlying assets to mature. There are two variants:
 - **Park in DeFi lending.** Example: Maple's syrupUSD pools park uninvested capital across DeFi protocols, including Sky and Aave, as a liquidity buffer.⁴ New deposits earn yield immediately from the buffer while waiting for loan origination, and withdrawals get funded without waiting for short-duration loans to mature. The cost: every dollar in the buffer earns less than a dollar deployed to loans, compressing the pool's blended rate.
 - **Hold T-bills as the buffer.** Example: USD.ai's sUSDai uses T-bills via M0 as base yield while originating GPU-collateralized loans on top.⁵
 
-**2. Spread yield across the pool.** Pool new deposits into an already-earning pool so no individual depositor experiences deployment delay. The new capital dilutes the blended rate, but in a large pool the dilution is a rounding error. The cost is that existing depositors subsidize new ones. Example: Vaults on Morpho use this.
+**B. Spread yield across the pool.** Pool new deposits into an already-earning pool so no individual depositor experiences deployment delay. The new capital dilutes the blended rate, but in a large pool the dilution is a rounding error. The cost is that existing depositors subsidize new ones. Example: Vaults on Morpho use this.
 
-**3. Get liquidity from a third party.** Instead of redeeming from the fund, the holder gets cash from someone else. The fund never sells anything. This strategy only works for speeding up redemptions and does not apply to deployments.
+**C. Get liquidity from a third party.** Instead of redeeming from the fund, the holder gets cash from someone else. The fund never sells anything. This strategy only works for speeding up redemptions and does not apply to deployments.
 - **Pre-fund a stablecoin pool that buys tokens at NAV.** Example: Circle provisioned up to $20M USDC in a smart contract for BUIDL,⁶ giving holders an instant stablecoin off-ramp for the largest tokenized Treasury product. When a holder redeems, BUIDL transfers to Circle and USDC transfers to the holder atomically. Circle redeems with BlackRock off-chain. The pool is finite. If redemption demand exceeds it, holders fall back to the fund's standard daily redemption.
 - **Use market makers to buy tokens at NAV.** Example: Centrifuge's Anemoy Liquid Network has professional counterparties (Wintermute, Keyrock, Arbelos)⁷ who provide instant redemptions for Centrifuge fund tokens, paying the holder in stablecoins the same day (up to $125M, 24/7). The market makers absorb the wait: they hold the tokens, earn yield, and redeem through the fund's slow channel themselves.
 - **Borrow against RWA tokens on DeFi lending markets.** If the token is listed as collateral on a lending market, holders can borrow stablecoins against it instead of redeeming, even on weekends or outside the fund's redemption window. The fund is never involved. The same mechanic also enables looping, which we will discuss later as a catalyst for new RWA demand.
@@ -132,11 +132,11 @@ RWAs are being pulled on-chain by growing demand.
 
 On-chain capital is sticky. When rates climbed and the risk-free rate was not widely accessible on-chain, stablecoin supply fell from over $180B to under $125B, but it did not collapse. A meaningful base stayed despite not being able to access the risk-free rate. Now that real-world yield exists on-chain, supply has grown from $130B to over $300B.¹³ Five forces are compounding.
 
-### 1. A bigger stablecoin base means a wider distribution of yield preferences.
+### A. A bigger stablecoin base means a wider distribution of yield preferences.
 
 Protocol treasuries managing billions want different things than retail holders parking savings. Not everyone wants 3% from Treasuries. Some want 8% from private credit. Some want 15% from a leveraged strategy. But today, that demand is funneling into the same handful of products.
 
-### 2. Concentration in the same underlying assets is creating hunger for diversification.
+### B. Concentration in the same underlying assets is creating hunger for diversification.
 
 The top 10 yield-bearing, non-stablecoin RWAs hold 64% of total value. BlackRock's BUIDL is simultaneously the backing for Ethena's USDtb, a primary underlying asset in Ondo's OUSG, and a direct holding of Sky's Grove protocol.¹⁴ Three of the largest protocols in on-chain yield are correlated to the same Treasury fund.
 
@@ -146,7 +146,7 @@ The same logic applies to every protocol and DAO treasury sitting in Treasuries 
 
 Three layers of on-chain infrastructure independently amplify the demand for every asset that arrives.
 
-### 3. Vaults let curators absorb the duration and liquidity risk that individual assets cannot.
+### C. Vaults let curators absorb the duration and liquidity risk that individual assets cannot.
 
 A multi-asset vault does not need each position to be individually fast or liquid. A curator managing Treasuries, private credit, and CLOs can add a slow-originating, high-yield source because the rest of the portfolio covers liquidity. The depositor sees blended yield with instant access. The bar for new assets drops: they need to be yield-generating and legally wrappable. The curator handles the rest.
 
@@ -156,7 +156,7 @@ Apollo signed a cooperation agreement to acquire up to 90M MORPHO tokens over 48
 
 Vaults are still maturing. Yields today are partly subsidized by token incentives. A vault advertising 12% APY may deliver 4% organically, with the rest in tokens. And no standardized ratings exist for curators, so depositors have limited tools to evaluate risk. That is itself an opportunity.
 
-### 4. Tranching and yield decomposition expand the buyer base for every asset that comes on-chain.
+### D. Tranching and yield decomposition expand the buyer base for every asset that comes on-chain.
 
 A single yield stream serves a single risk profile. Tranching splits it into multiple products, each calibrated to a different buyer. A senior tranche offering 4% with first-loss protection suits a conservative DAO treasury. A junior tranche offering 12% with concentrated downside risk attracts yield seekers willing to underwrite that loss. The same underlying asset reaches both buyers. Royco Dawn and Strata are building general-purpose tranching layers.
 
@@ -164,7 +164,7 @@ Pendle does something different. Instead of splitting by credit risk, Pendle spl
 
 Both tranching and yield decomposition cover a narrow set of underlying assets today. But as they mature, every new asset that comes on-chain can be sliced into products for multiple buyer segments without requiring new origination.
 
-### 5. Leverage multiplies demand for every asset already on-chain.
+### E. Leverage multiplies demand for every asset already on-chain.
 
 Once a tokenized RWA is listed as collateral on a lending market, holders can loop: deposit the RWA, borrow stablecoins against it, buy more of the same RWA, repeat. A 5% tokenized yield asset becomes 8-10% at 2-3x leverage minus borrowing costs. Gauntlet already manages a levered sACRED strategy on Morpho, and Centrifuge's JAAA is listed on Aave Horizon, where Resolv has proposed deploying up to $100M in similar strategies. Each loop creates incremental demand for the same asset without new origination.
 
