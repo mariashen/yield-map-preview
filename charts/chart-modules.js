@@ -10,15 +10,18 @@ const CHARTS = {};
 // Does this asset have a verified 7d trailing APY?
 function has7d(d) { return d.yield_7d != null && d.yield_7d !== 0; }
 
-// Best yield for plotting: use 7d if available, fall back to stated target
+// Does this asset have an rwa.xyz stated target?
+function hasTarget(d) { return d.yield_targeted != null && d.yield_targeted !== 0; }
+
+// Best yield for plotting: use 7d if available, fall back to rwa.xyz target
 function plotYield(d) {
   if (has7d(d)) return d.yield_7d;
-  if (d.yield_stated != null && d.yield_stated !== 0) return d.yield_stated;
-  return d.yield_pct || 0;
+  if (hasTarget(d)) return d.yield_targeted;
+  return 0;
 }
 
 // Is this asset using a target (not 7d) for its plot position?
-function isTargetOnly(d) { return !has7d(d) && d.yield_stated != null && d.yield_stated !== 0; }
+function isTargetOnly(d) { return !has7d(d) && hasTarget(d); }
 
 // Description lines for afterBody — first sentence only
 function descLines(m) {
@@ -42,15 +45,15 @@ function descLines(m) {
 function yieldTooltipLines(m) {
   var lines = [];
   var h7d = has7d(m);
-  var hasStated = m.yield_stated != null && m.yield_stated !== 0;
+  var hTgt = hasTarget(m);
 
   // Yield figures — always show both lines for consistency
-  if (h7d && hasStated) {
-    lines.push('7-day APY: ' + fmtPct(m.yield_7d) + '  \u00b7  Target: ' + fmtPct(m.yield_stated));
+  if (h7d && hTgt) {
+    lines.push('7-day APY: ' + fmtPct(m.yield_7d) + '  \u00b7  Target: ' + fmtPct(m.yield_targeted));
   } else if (h7d) {
     lines.push('7-day APY: ' + fmtPct(m.yield_7d));
-  } else if (hasStated) {
-    lines.push('7-day APY: N/A  \u00b7  Target: ' + fmtPct(m.yield_stated));
+  } else if (hTgt) {
+    lines.push('7-day APY: N/A  \u00b7  Target: ' + fmtPct(m.yield_targeted));
   }
 
   // Source
@@ -65,8 +68,7 @@ function yieldTooltipLines(m) {
 // Short yield label for first tooltip line
 function yieldLabel(m) {
   if (has7d(m)) return fmtPct(m.yield_7d) + ' (7d APY)';
-  if (m.yield_stated != null && m.yield_stated !== 0) return fmtPct(m.yield_stated) + ' (target)';
-  if (m.yield_pct > 0) return fmtPct(m.yield_pct);
+  if (hasTarget(m)) return fmtPct(m.yield_targeted) + ' (target)';
   return '\u2014';
 }
 
@@ -351,7 +353,7 @@ CHARTS['yield-vs-date'] = function(container) {
   s.filtersEl.parentNode.insertBefore(note, s.filtersEl.nextSibling);
   var LAUNCH_COLORS = Object.assign({}, COLORS, { 'Stablecoins with RWA Yield': COLORS['Stablecoins'] });
   var renCls = function(c) { return c === 'Stablecoins' ? 'Stablecoins with RWA Yield' : c; };
-  var items = DATA.filter(function(d) { return parseDate(d.inception_date) && !LAUNCH_DATE_EXCLUDED_TICKERS.has(d.ticker) && plotYield(d) > 0; })
+  var items = DATA.filter(function(d) { return parseDate(d.inception_date) && !LAUNCH_DATE_EXCLUDED_TICKERS.has(d.ticker) && (has7d(d) || hasTarget(d)); })
     .map(function(d) { return Object.assign({}, d, { date: parseDate(d.inception_date) }); });
   var classes = Array.from(new Set(items.map(function(d) { return renCls(d.asset_class); }))).sort();
   var allValues = items.map(function(d) { return d.value_usd; });
@@ -377,7 +379,7 @@ CHARTS['yield-vs-date'] = function(container) {
         responsive: true, maintainAspectRatio: false,
         scales: {
           x: { type: 'time', time: { unit: 'year' }, title: { display: true, text: 'Launch Date' } },
-          y: { title: { display: true, text: 'Yield (%)' }, ticks: { callback: function(v) { return v + '%'; } }, min: 0 },
+          y: { title: { display: true, text: 'Yield (%)' }, ticks: { callback: function(v) { return v + '%'; } } },
         },
         plugins: {
           datalabels: { display: false },
@@ -891,15 +893,17 @@ CHARTS['holders-value-savings'] = function(container) {
           }),
           legend: LEGEND_BOTTOM,
           tooltip: { callbacks: {
-            title: function(ctx) { return ctx[0].raw._meta.name; },
+            title: function(ctx) { var m = ctx[0].raw._meta; return m.has_override ? m.savings_token : m.name; },
             label: function(ctx) {
               var m = ctx.raw._meta, lines = [];
               var fmtH = function(n) { return n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : n.toLocaleString(); };
-              lines.push(m.ticker + ': ' + fmtUSD(m.value_usd));
               if (m.has_override) {
+                lines.push('Base token: ' + m.name + ' (' + m.ticker + ')');
+                lines.push('Value: ' + fmtUSD(m.value_usd));
                 lines.push('Staking holders (' + m.savings_token + '): ' + fmtH(m.display_holders));
                 lines.push('Base holders (' + m.ticker + '): ' + fmtH(m.base_holders));
               } else {
+                lines.push(m.ticker + ': ' + fmtUSD(m.value_usd));
                 lines.push('Holders: ' + fmtH(m.display_holders));
               }
               if (m.top_10_holder_pct != null) lines.push('Top 10 hold: ' + fmtPct(m.top_10_holder_pct));

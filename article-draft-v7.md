@@ -110,6 +110,7 @@ New yield types and new strategies only matter if they reach capital. Today, dis
 
 [chart:holders-value-savings]
 *Each bubble is a yield-bearing asset, sized by on-chain value, filtered to savings/staking holders actually earning yield.*
+*Data: [rwa.xyz](https://app.rwa.xyz) on-chain holder data and distributed values (March 8, 2026). Yield sources per Methodology.*
 
 Most yield-bearing assets cluster on the left: 33 of 35 non-stablecoin RWAs above $50M have fewer than 2,000 holders. Most of that is structural: BUIDL is a fund limited to qualified purchasers with a $5M minimum,⁸ and ~100 holders is by design. But for products that could reach a broader base, the low counts reflect the dependency current RWAs have on partners for distribution. The exceptions in the upper right are staked stablecoins like sUSDe, sDAI, and sUSDS, which reach far more holders. That contrast points to three distribution strategies:
 
@@ -202,7 +203,7 @@ If you are building the next layer, we want to talk.
 
 *Every inception date in the launch timeline chart was verified against at least one independent source: protocol press releases, on-chain contract deployment timestamps, SEC filings, or financial news coverage. Three assets were removed because their launch dates could not be independently corroborated: PKH2 (a Liquid Network mining note with no public block explorer), BELIF (a Bosera segregated portfolio with limited press coverage), and CFSRS (a recently launched Hong Kong fund with no independent coverage at time of publication). All three remain in the underlying dataset and appear in other charts.*
 
-*Charts that show yield include only yield-bearing assets above $50M. Non-yield stablecoins and appreciation-only assets are excluded entirely. For 32 of these assets (92% of yield-bearing value), we report a verified 7-day trailing APY from one of three programmatic sources: [rwa.xyz](https://app.rwa.xyz) on-chain NAV (16 assets), the [DeFiLlama Yields API](https://yields.llama.fi/pools) native staking pools (12 assets), or protocol-specific APIs — [Centrifuge GraphQL](https://api.centrifuge.io) (3 assets), [Re protocol](https://api.re.xyz/apy/get-apy) (1 asset), and [Superstate](https://superstate.com/assets/uscc) (1 asset). The remaining 21 assets lack a reliable trailing yield source. Rather than exclude them — which would hide exactly the higher-yield assets founders are trying to bring on-chain — we display their stated target APYs from fund documentation, protocol websites, or rwa.xyz asset profiles. These are not trailing returns and should not be compared directly to 7-day figures. They appear on charts with distinctly different visual treatment (dimmed, dashed borders) and are labeled as targets in every tooltip. We include them solely to show the yield spectrum that tokenization is reaching for, not to imply equivalence with verified trailing data.*
+*Charts that show yield include only yield-bearing assets above $50M. Non-yield stablecoins and appreciation-only assets are excluded entirely. For 29 of 53 yield-bearing assets (88% of yield-bearing value), we report a verified 7-day trailing APY from one of three programmatic sources: [rwa.xyz](https://app.rwa.xyz) on-chain NAV (16 assets), the [DeFiLlama Yields API](https://yields.llama.fi/pools) native staking pools (11 assets), or protocol-specific APIs — [Re protocol](https://api.re.xyz/apy/get-apy) (1 asset) and [Superstate](https://superstate.com/assets/uscc) (1 asset). For 8 additional assets that lack a reliable trailing yield, we display the stated target APY from [rwa.xyz](https://app.rwa.xyz) asset profiles or fund documentation (e.g., Centrifuge IPFS fund fact sheets). These targets are not trailing returns and should not be compared directly to 7-day figures. They appear on charts with distinctly different visual treatment — dimmed with dashed borders — and are labeled as targets in every tooltip. We include them solely to show the yield spectrum that tokenization is reaching for, not to imply equivalence with verified trailing data. The remaining 16 assets have no verified yield from any source in our hierarchy and do not display yield in charts.*
 
 *All aggregate market figures use rwa.xyz distributed values as of March 8, 2026. Stablecoin market capitalization is reported from both rwa.xyz (~$301B) and DeFiLlama (~$313B).*
 
@@ -235,3 +236,23 @@ If you are building the next layer, we want to talk.
 *¹³ [DefiLlama Stablecoins](https://defillama.com/stablecoins).*
 
 *¹⁴ rwa.xyz on-chain holder data, March 8, 2026. Ethena USDtb backed by BUIDL per [USDtb](https://usdtb.money); Ondo OUSG per [Ondo Finance](https://ondo.finance/blog/the-liquidity-advantage-how-ousg-provides-robust-multi-venue-instant-liquidity); Sky/Grove per [Sky governance vote](https://vote.sky.money/executive/template-executive-vote-launch-agent-onboarding).*
+
+---
+
+## Disclaimer & Disclosures
+
+**This Content is for Informational Purposes Only.**
+
+Any content included in this report is informational only and not an offer, solicitation, or recommendation to buy or sell securities or pursue any particular investment strategy, and does not constitute the provision of investment advice. Electric Capital Partners, LLC (together with its affiliates, "Electric Capital") does not provide advice of any kind through this report, its website, or social media posts. Information in this report or any posts may not be used or relied upon in evaluating the merits of any investment.
+
+You should consult your own advisers as to business, financial, tax, legal, or other related matters concerning any investment.
+
+Certain information has been obtained from third-party sources, including from portfolio companies of funds managed by Electric Capital. Content is as of the date posted and subject to change without notice.
+
+Electric Capital makes no representations about the enduring accuracy of this information, or its appropriateness for a given scenario.
+
+Electric Capital may have previously held, currently holds, or will in the future hold token or equity interests in one or more of the ecosystems or projects mentioned in this report.
+
+A non-exhaustive list of past and present investments made by vehicles managed by Electric Capital is [available here](https://www.electriccapital.com). Excluded from this list are investments (and certain publicly traded cryptocurrencies or other digital assets) for which the issuer has not provided permission for Electric Capital to disclose publicly. Electric Capital does not short tokens.
+
+Please see [https://electriccapital.com/disclosures](https://electriccapital.com/disclosures) for additional important information.

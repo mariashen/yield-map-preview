@@ -126,7 +126,7 @@ tr:nth-child(even) { background: #0b1020; }
 window.injectStyles = function() {};
 
 async function init() {
-  var resp = await fetch('article-draft-v7.md?v=' + Date.now());
+  var resp = await fetch('article-draft-v8.md?v=' + Date.now());
   var md = await resp.text();
 
   // ── Pre-process: replace [chart:id] markers with HTML containers ──
